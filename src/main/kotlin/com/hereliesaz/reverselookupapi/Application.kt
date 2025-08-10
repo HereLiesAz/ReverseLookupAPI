@@ -1,4 +1,4 @@
-package com.example
+package com.hereliesaz.reverselookupapi
 
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -14,8 +14,12 @@ import kotlinx.serialization.json.Json
  * This function starts the embedded Netty server.
  */
 fun main() {
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
-        .start(wait = true)
+    try {
+        embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+            .start(wait = true)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }
 
 /**
@@ -33,7 +37,9 @@ fun Application.module() {
 
     // Create an instance of the search service.
     // In a real application, this would be injected using a dependency injection framework.
-    val searchService: SearchService = MockSearchService()
+    val cyberBackgroundChecksService = CyberBackgroundChecksService()
+    val smartBackgroundChecksService = SmartBackgroundChecksService()
+    val searchService: SearchService = OrchestratorService(cyberBackgroundChecksService, smartBackgroundChecksService)
 
     // Configure the routing for the application.
     routing {
