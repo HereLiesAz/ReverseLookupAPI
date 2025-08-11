@@ -33,7 +33,7 @@ fun Application.module() {
 
     // Create an instance of the search service.
     // In a real application, this would be injected using a dependency injection framework.
-    val searchService: SearchService = MockSearchService()
+    val searchService: SearchService = FlareSolverrSearchService()
 
     // Configure the routing for the application.
     routing {
