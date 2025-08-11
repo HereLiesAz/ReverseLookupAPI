@@ -1,4 +1,4 @@
-package com.example
+package com.hereliesaz.reverselookupapi
 
 import kotlinx.serialization.Serializable
 
@@ -35,7 +35,7 @@ interface SearchService {
      * @param name The name to search for.
      * @return A [SearchResult] containing a list of matching people.
      */
-    fun searchByName(name: String): SearchResult
+    suspend fun searchByName(name: String): SearchResult
 
     /**
      * Searches for a person by address.
@@ -77,7 +77,7 @@ class MockSearchService : SearchService {
         Person("2", "Jane Doe", 25, "456 Oak Ave, Othertown, USA", "555-5678", "jane.doe@email.com")
     )
 
-    override fun searchByName(name: String): SearchResult {
+    override suspend fun searchByName(name: String): SearchResult {
         // In a real implementation, this would use the name to filter results.
         // For now, we return all mock data.
         return SearchResult(mockData)
