@@ -9,6 +9,13 @@ import kotlinx.serialization.Serializable
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
+/**
+ * Represents the JSON request body for the FlareSolverr `/v1` endpoint.
+ *
+ * @property cmd The command to execute (e.g., "request.get").
+ * @property url The URL to request.
+ * @property maxTimeout The maximum timeout for the request in milliseconds.
+ */
 @Serializable
 data class FlareSolverrRequest(
     val cmd: String,
@@ -16,6 +23,13 @@ data class FlareSolverrRequest(
     val maxTimeout: Int = 60000
 )
 
+/**
+ * Represents the JSON response body from the FlareSolverr `/v1` endpoint.
+ *
+ * @property status The status of the request (e.g., "ok" or "error").
+ * @property message A message from FlareSolverr, usually present in case of an error.
+ * @property solution The solution object containing the response from the target website.
+ */
 @Serializable
 data class FlareSolverrResponse(
     val status: String,
@@ -23,6 +37,14 @@ data class FlareSolverrResponse(
     val solution: FlareSolverrSolution
 )
 
+/**
+ * Represents the solution part of the FlareSolverr response.
+ *
+ * @property url The final URL after any redirects.
+ * @property status The HTTP status code of the response.
+ * @property response The HTML content of the response.
+ * @property userAgent The user agent used for the request.
+ */
 @Serializable
 data class FlareSolverrSolution(
     val url: String,
@@ -35,8 +57,12 @@ data class FlareSolverrSolution(
  * An implementation of the [SearchService] that uses FlareSolverr to bypass Cloudflare
  * and scrape search results from a target website.
  *
- * @param flaresolverrUrl The URL of the FlareSolverr instance.
- * @param targetUrl The base URL of the website to scrape.
+ * This service sends requests to a running FlareSolverr instance, which in turn makes
+ * the requests to the target website and returns the HTML content. This service then
+ * parses the HTML to extract the search results.
+ *
+ * @property flaresolverrUrl The URL of the FlareSolverr instance.
+ * @property targetUrl The base URL of the website to scrape.
  */
 class FlareSolverrSearchService(
     private val flaresolverrUrl: String = "http://localhost:8191",
@@ -45,6 +71,12 @@ class FlareSolverrSearchService(
 
     private val client = HttpClient(CIO)
 
+    /**
+     * Retrieves the HTML content of a given URL using FlareSolverr.
+     *
+     * @param url The URL to retrieve.
+     * @return A Jsoup [Document] if the request is successful, otherwise `null`.
+     */
     private suspend fun getDocument(url: String): Document? {
         val flareSolverrRequest = FlareSolverrRequest(
             cmd = "request.get",
@@ -69,6 +101,12 @@ class FlareSolverrSearchService(
         }
     }
 
+    /**
+     * Parses the search results from a Jsoup [Document].
+     *
+     * @param document The Jsoup document containing the search results page HTML.
+     * @return A [SearchResult] containing the parsed persons.
+     */
     private fun parseSearchResults(document: Document): SearchResult {
         // This parsing logic is a guess and will likely need to be adjusted.
         val matches = document.select(".record").map { element ->

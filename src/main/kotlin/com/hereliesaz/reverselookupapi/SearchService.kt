@@ -4,7 +4,17 @@ import kotlinx.serialization.Serializable
 
 /**
  * Represents a person's details.
- * This data class is used for serialization to JSON.
+ *
+ * This data class encapsulates the information about a single person,
+ * including their ID, name, age, address, phone number, and email.
+ * It is marked as serializable for conversion to and from JSON.
+ *
+ * @property id The unique identifier for the person.
+ * @property name The full name of the person.
+ * @property age The age of the person.
+ * @property address The physical address of the person.
+ * @property phone The phone number of the person.
+ * @property email The email address of the person.
  */
 @Serializable
 data class Person(
@@ -17,8 +27,12 @@ data class Person(
 )
 
 /**
- * Represents the result of a search, containing a list of matching persons.
- * This data class is used for serialization to JSON.
+ * Represents the result of a search operation.
+ *
+ * This data class holds a list of [Person] objects that match the search criteria.
+ * It is marked as serializable for conversion to and from JSON.
+ *
+ * @property matches A list of [Person] objects that matched the search.
  */
 @Serializable
 data class SearchResult(
@@ -27,49 +41,59 @@ data class SearchResult(
 
 /**
  * Defines the contract for a search service.
- * This interface allows for different implementations (e.g., mock vs. real).
+ *
+ * This interface provides a set of methods for searching for people using different criteria.
+ * It is designed to be implemented by different search providers, such as a mock service
+ * for testing or a real service that interacts with a web scraper.
  */
 interface SearchService {
     /**
-     * Searches for people by name.
+     * Searches for people by their full name.
+     *
      * @param name The name to search for.
-     * @return A [SearchResult] containing a list of matching people.
+     * @return A [SearchResult] containing a list of people who match the name.
      */
     suspend fun searchByName(name: String): SearchResult
 
     /**
-     * Searches for a person by address.
+     * Searches for people by their physical address.
+     *
      * @param address The address to search for.
-     * @return A [SearchResult] containing the most likely match.
+     * @return A [SearchResult] containing a list of people associated with the address.
      */
     suspend fun searchByAddress(address: String): SearchResult
 
     /**
-     * Searches for a person by phone number.
+     * Searches for people by their phone number.
+     *
      * @param phone The phone number to search for.
-     * @return A [SearchResult] containing the most likely match.
+     * @return A [SearchResult] containing a list of people associated with the phone number.
      */
     suspend fun searchByPhone(phone: String): SearchResult
 
     /**
-     * Searches for a person by email address.
+     * Searches for people by their email address.
+     *
      * @param email The email address to search for.
-     * @return A [SearchResult] containing the most likely match.
+     * @return A [SearchResult] containing a list of people associated with the email address.
      */
     suspend fun searchByEmail(email: String): SearchResult
 
     /**
-     * Gets the details of a person by their ID.
-     * @param id The ID of the person to retrieve.
-     * @return The [Person] object, or null if not found.
+     * Retrieves the details of a specific person by their unique ID.
+     *
+     * @param id The unique identifier of the person to retrieve.
+     * @return The [Person] object if found, otherwise `null`.
      */
     suspend fun getPersonById(id: String): Person?
 }
 
 /**
- * A mock implementation of the [SearchService] that returns hardcoded data.
- * This is a placeholder and should be replaced with a real implementation
- * that scrapes the target website.
+ * A mock implementation of the [SearchService] for testing purposes.
+ *
+ * This class returns a hardcoded list of [Person] objects and does not perform any real
+ * search operations. It is useful for testing the API endpoints without relying on the
+ * web scraper or external services.
  */
 class MockSearchService : SearchService {
     private val mockData = listOf(
@@ -78,24 +102,19 @@ class MockSearchService : SearchService {
     )
 
     override suspend fun searchByName(name: String): SearchResult {
-        // In a real implementation, this would use the name to filter results.
-        // For now, we return all mock data.
-        return SearchResult(mockData)
+        return SearchResult(mockData.filter { it.name.contains(name, ignoreCase = true) })
     }
 
     override suspend fun searchByAddress(address: String): SearchResult {
-        // In a real implementation, this would use the address to find a match.
-        return SearchResult(mockData.take(1)) // Return the most likely match
+        return SearchResult(mockData.filter { it.address.contains(address, ignoreCase = true) })
     }
 
     override suspend fun searchByPhone(phone: String): SearchResult {
-        // In a real implementation, this would use the phone to find a match.
-        return SearchResult(mockData.take(1)) // Return the most likely match
+        return SearchResult(mockData.filter { it.phone == phone })
     }
 
     override suspend fun searchByEmail(email: String): SearchResult {
-        // In a real implementation, this would use the email to find a match.
-        return SearchResult(mockData.take(1)) // Return the most likely match
+        return SearchResult(mockData.filter { it.email.equals(email, ignoreCase = true) })
     }
 
     override suspend fun getPersonById(id: String): Person? {

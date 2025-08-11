@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "1.9.22"
     id("io.ktor.plugin") version "2.3.9"
     kotlin("plugin.serialization") version "1.9.22"
+    id("org.jetbrains.dokka") version "2.0.0"
 }
 
 group = "com.hereliesaz.reverselookupapi"
@@ -12,6 +13,10 @@ version = "0.0.1"
 
 application {
     mainClass.set("com.hereliesaz.reverselookupapi.ApplicationKt")
+}
+
+kotlin {
+    jvmToolchain(21)
 }
 
 kotlin {
