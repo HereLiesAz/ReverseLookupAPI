@@ -37,9 +37,7 @@ fun Application.module() {
 
     // Create an instance of the search service.
     // In a real application, this would be injected using a dependency injection framework.
-    val cyberBackgroundChecksService = CyberBackgroundChecksService()
-    val smartBackgroundChecksService = SmartBackgroundChecksService()
-    val searchService: SearchService = OrchestratorService(cyberBackgroundChecksService, smartBackgroundChecksService)
+    val searchService: SearchService = FlareSolverrSearchService()
 
     // Configure the routing for the application.
     routing {
